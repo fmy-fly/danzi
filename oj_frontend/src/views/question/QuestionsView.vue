@@ -1,59 +1,127 @@
 <template>
-  <div id="questionsView">
-    <a-form :model="searchParams" layout="inline">
-      <a-form-item field="title" label="名称" style="min-width: 240px">
-        <a-input v-model="searchParams.title" placeholder="请输入名称" />
-      </a-form-item>
-      <a-form-item field="tags" label="标签" style="min-width: 240px">
-        <a-input-tag v-model="searchParams.tags" placeholder="请输入标签" />
-      </a-form-item>
-      <a-form-item>
-        <a-button type="primary" @click="doSubmit">提交</a-button>
-      </a-form-item>
-    </a-form>
-    <a-divider size="0" />
-    <a-table
-      :ref="tableRef"
-      :columns="columns"
-      :data="dataList"
-      :pagination="{
-        showTotal: true,
-        pageSize: searchParams.pageSize,
-        current: searchParams.current,
-        total,
-      }"
-      @page-change="onPageChange"
-    >
-      <template #tags="{ record }">
-        <a-space wrap>
-          <a-tag v-for="(tag, index) of record.tags" :key="index" color="green"
-            >{{ tag }}
-          </a-tag>
-        </a-space>
-      </template>
-      <template #acceptedRate="{ record }">
-        {{
-          `${
-            record.submitNum ? record.acceptedNum / record.submitNum : "0"
-          }% (${record.acceptedNum}/${record.submitNum})`
-        }}
-      </template>
-      <template #createTime="{ record }">
-        {{ moment(record.createTime).format("YYYY-MM-DD") }}
-      </template>
-      <template #optional="{ record }">
-        <a-space>
-          <a-button type="primary" @click="toQuestionPage(record)">
-            做题
-          </a-button>
-        </a-space>
-      </template>
-    </a-table>
+  <div>
+    <a-layout style="height: 100%">
+      <a-layout>
+        <a-layout-content>
+          <div id="questionsView">
+            <a-form :model="searchParams" layout="inline">
+              <a-form-item field="title" label="名称" style="min-width: 240px">
+                <a-input
+                  v-model="searchParams.title"
+                  placeholder="请输入名称"
+                />
+              </a-form-item>
+              <a-form-item field="tags" label="标签" style="min-width: 240px">
+                <a-input-tag
+                  v-model="searchParams.tags"
+                  placeholder="请输入标签"
+                />
+              </a-form-item>
+              <a-form-item>
+                <a-button type="primary" @click="doSubmit">提交</a-button>
+              </a-form-item>
+            </a-form>
+            <a-divider size="0" />
+            <a-table
+              :ref="tableRef"
+              :columns="columns"
+              :data="dataList"
+              :pagination="{
+                showTotal: true,
+                pageSize: searchParams.pageSize,
+                current: searchParams.current,
+                total,
+              }"
+              @page-change="onPageChange"
+            >
+              <template #tags="{ record }">
+                <a-space wrap>
+                  <a-tag
+                    v-for="(tag, index) of record.tags"
+                    :key="index"
+                    color="green"
+                    >{{ tag }}
+                  </a-tag>
+                </a-space>
+              </template>
+              <template #acceptedRate="{ record }">
+                {{
+                  `${
+                    record.submitNum
+                      ? (record.acceptedNum / record.submitNum) * 100
+                      : "0"
+                  }% (${record.acceptedNum}/${record.submitNum})`
+                }}
+              </template>
+
+              <template #difficulty="{ record }">
+                <a-space wrap>
+                  <a-tag
+                    v-if="
+                      record.submitNum &&
+                      record.acceptedNum / record.submitNum >= 0.8
+                    "
+                    color="green"
+                  >
+                    简单
+                  </a-tag>
+                  <a-tag
+                    v-else-if="
+                      record.submitNum &&
+                      record.acceptedNum / record.submitNum >= 0.5
+                    "
+                    color="gold"
+                  >
+                    普通
+                  </a-tag>
+                  <a-tag v-else color="red"> 困难 </a-tag>
+                </a-space>
+              </template>
+
+              <template #createTime="{ record }">
+                {{ moment(record.createTime).format("YYYY-MM-DD") }}
+              </template>
+              <template #optional="{ record }">
+                <a-space>
+                  <a-button type="primary" @click="toQuestionPage(record)">
+                    做题
+                  </a-button>
+                </a-space>
+              </template>
+            </a-table>
+          </div>
+        </a-layout-content>
+        <a-layout-sider theme="light" style="width: 30%">
+          <a-card hoverable :style="{ width: '99%' }">
+            <template #cover>
+              <div
+                :style="{
+                  height: '100px',
+                  overflow: 'hidden',
+                }"
+              >
+                <img
+                  :style="{ width: '100%', transform: 'translateY(-110px)' }"
+                  alt="dessert"
+                  src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a20012a2d4d5b9db43dfc6a01fe508c0.png~tplv-uwbnlip3yd-webp.webp"
+                />
+              </div>
+            </template>
+            <a-card-meta title="打卡日历">
+              <template #description>
+                <RoutineCard></RoutineCard>
+              </template>
+            </a-card-meta>
+          </a-card>
+        </a-layout-sider>
+      </a-layout>
+    </a-layout>
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, watchEffect } from "vue";
+import RoutineCard from "@/components/RoutineCard.vue";
 import {
   Page_Question_,
   Question,
@@ -61,7 +129,7 @@ import {
   QuestionQueryRequest,
 } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
-import * as querystring from "querystring";
+
 import { useRouter } from "vue-router";
 import moment from "moment";
 
@@ -122,6 +190,10 @@ const columns = [
     slotName: "acceptedRate",
   },
   {
+    title: "难度",
+    slotName: "difficulty",
+  },
+  {
     title: "创建时间",
     slotName: "createTime",
   },
@@ -164,6 +236,7 @@ const doSubmit = () => {
 <style scoped>
 #questionsView {
   max-width: 1280px;
-  margin: 0 auto;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 </style>

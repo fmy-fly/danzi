@@ -21,9 +21,32 @@
         </a-menu-item>
       </a-menu>
     </a-col>
-    <a-col flex="100px">
+    <a-col flex="200px">
       <div>
-        {{ store.state.user?.loginUser?.userName ?? "未登录" }}
+        <!-- 如果已登录，显示用户名和下拉菜单 -->
+        <template v-if="store.state.user?.loginUser?.userName !== ''">
+          <a-space size="large">
+            <a-dropdown @select="handleSelect">
+              <!-- 显示用户名 -->
+              <a-button class="userName" style="background: white"
+                >{{ store.state.user.loginUser.userName }}
+              </a-button>
+              <template #content>
+                <a-doption @click="personnalInformation">个人信息</a-doption>
+                <!--                <a-doption disabled>Option 2</a-doption>-->
+                <!-- 点击退出时调用 logout 方法 -->
+                <a-doption @click="logout">退出</a-doption>
+              </template>
+            </a-dropdown>
+          </a-space>
+        </template>
+
+        <!-- 如果未登录，显示登录或注册链接 -->
+        <template v-else>
+          <a-link href="user/login">登录</a-link>
+          或
+          <a-link href="user/register">注册</a-link>
+        </template>
       </div>
     </a-col>
   </a-row>
@@ -36,6 +59,7 @@ import { computed, ref } from "vue";
 import { useStore } from "vuex";
 import checkAccess from "@/access/checkAccess";
 import ACCESS_ENUM from "@/access/accessEnum";
+import { UserControllerService } from "../../generated";
 
 const router = useRouter();
 const store = useStore();
@@ -68,7 +92,7 @@ console.log();
 
 setTimeout(() => {
   store.dispatch("user/getLoginUser", {
-    userName: "鱼皮管理员",
+    userName: "管理员",
     userRole: ACCESS_ENUM.ADMIN,
   });
 }, 3000);
@@ -78,9 +102,28 @@ const doMenuClick = (key: string) => {
     path: key,
   });
 };
+const logout = () => {
+  UserControllerService.userLogoutUsingPost();
+  window.location.reload();
+};
+const personnalInformation = () => {
+  router.push({
+    path: `/person/information/${store.state.user.loginUser.userName}`,
+    replace: true,
+  });
+};
+
+const handleSelect = (v) => {
+  console.log(v);
+};
 </script>
 
 <style scoped>
+.userName {
+  font-size: 18px;
+  margin-left: 20px;
+}
+
 .title-bar {
   display: flex;
   align-items: center;
