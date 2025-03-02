@@ -128,7 +128,10 @@
   </a-card>
 
   <div :style="{ display: 'flex', marginTop: '2%' }">
-    <a-card :style="{ width: '360px' }" title="个人简介 | 座右铭">
+    <a-card
+      :style="{ width: '360px', height: '300px' }"
+      title="个人简介 | 座右铭"
+    >
       <template #extra>
         <a-button status="success" @click="handleClick2"
           >修改座右铭</a-button

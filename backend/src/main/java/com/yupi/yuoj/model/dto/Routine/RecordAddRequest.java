@@ -1,4 +1,4 @@
-package com.yupi.yuoj.model.dto.question;
+package com.yupi.yuoj.model.dto.Routine;
 
 import lombok.Data;
 
@@ -12,37 +12,18 @@ import java.util.List;
  * @from <a href="https://yupi.icu">编程导航知识星球</a>
  */
 @Data
-public class QuestionAddRequest implements Serializable {
-
-    /**
-     * 标题
-     */
-    private String title;
+public class RecordAddRequest implements Serializable {
 
     /**
      * 内容
      */
-    private String content;
+    private String date;
 
     /**
      * 标签列表
      */
-    private List<String> tags;
+    private boolean check;
 
-    /**
-     * 题目答案
-     */
-    private String answer;
-
-    /**
-     * 判题用例
-     */
-    private List<JudgeCase> judgeCase;
-
-    /**
-     * 判题配置
-     */
-    private JudgeConfig judgeConfig;
 
     private static final long serialVersionUID = 1L;
 }

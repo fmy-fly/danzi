@@ -1,5 +1,6 @@
 package com.yupi.yuoj.controller;
 
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yupi.yuoj.annotation.AuthCheck;
 import com.yupi.yuoj.common.BaseResponse;
@@ -205,7 +206,9 @@ public class UserController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         User user = new User();
+
         BeanUtils.copyProperties(userUpdateRequest, user);
+        System.out.println("user" + user.getUserTags());
         boolean result = userService.updateById(user);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
@@ -305,7 +308,9 @@ public class UserController {
         User user = new User();
         BeanUtils.copyProperties(userUpdateMyRequest, user);
         user.setId(loginUser.getId());
+        user.setUserTags(JSONUtil.toJsonStr(userUpdateMyRequest.getUserTags()));
         boolean result = userService.updateById(user);
+        System.out.println("wzq" + result);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
     }

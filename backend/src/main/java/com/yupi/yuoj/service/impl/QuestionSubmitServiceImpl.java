@@ -27,7 +27,10 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -125,6 +128,33 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         return queryWrapper;
     }
 
+
+    @Override
+    public QueryWrapper<QuestionSubmit> getQueryAcceptWrapper(QuestionSubmitQueryRequest questionSubmitQueryRequest, User loginUser) {
+        QueryWrapper<QuestionSubmit> queryWrapper = new QueryWrapper<>();
+        if (questionSubmitQueryRequest == null) {
+            return queryWrapper;
+        }
+
+        String language = questionSubmitQueryRequest.getLanguage();
+        Integer status = questionSubmitQueryRequest.getStatus();
+        Long questionId = questionSubmitQueryRequest.getQuestionId();
+        Long userId = loginUser.getId();
+
+        String sortField = questionSubmitQueryRequest.getSortField();
+        String sortOrder = questionSubmitQueryRequest.getSortOrder();
+        // 拼接查询条件
+        queryWrapper.eq(StringUtils.isNotBlank(language), "language", language);
+        queryWrapper.eq(ObjectUtils.isNotEmpty(userId), "userId", userId);
+        queryWrapper.eq(ObjectUtils.isNotEmpty(questionId), "questionId", questionId);
+        queryWrapper.eq(QuestionSubmitStatusEnum.getEnumByValue(status) != null, "status", status);
+        queryWrapper.eq("isDelete", false);
+        queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
+                sortField);
+        return queryWrapper;
+
+    }
+
     @Override
     public QuestionSubmitVO getQuestionSubmitVO(QuestionSubmit questionSubmit, User loginUser) {
         QuestionSubmitVO questionSubmitVO = QuestionSubmitVO.objToVo(questionSubmit);
@@ -149,6 +179,35 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
                 .collect(Collectors.toList());
         questionSubmitVOPage.setRecords(questionSubmitVOList);
         return questionSubmitVOPage;
+    }
+
+    @Override
+    public Page<QuestionSubmitVO> getQuestionAcceptSubmitVOPage(Page<QuestionSubmit> questionSubmitPage, User loginUser) {
+        List<QuestionSubmit> questionSubmitList = questionSubmitPage.getRecords();
+        Page<QuestionSubmitVO> questionSubmitVOPage = new Page<>(questionSubmitPage.getCurrent(), questionSubmitPage.getSize(), questionSubmitPage.getTotal());
+
+        if (CollectionUtils.isEmpty(questionSubmitList)) {
+            return questionSubmitVOPage;
+        }
+// 使用 Map 按 questionId 去重
+        Map<Long, QuestionSubmit> questionSubmitMap = new LinkedHashMap<>();
+        for (QuestionSubmit questionSubmit : questionSubmitList) {
+            // 按 questionId 去重，如果已有该 questionId 的记录，则不再添加
+            questionSubmitMap.put(questionSubmit.getQuestionId(), questionSubmit);
+        }
+// 获取去重后的 QuestionSubmit 列表
+        List<QuestionSubmit> distinctQuestionSubmitList = new ArrayList<>(questionSubmitMap.values());
+
+// 转换为 QuestionSubmitVO 列表
+        List<QuestionSubmitVO> questionSubmitVOList = distinctQuestionSubmitList.stream()
+                .map(questionSubmit -> getQuestionSubmitVO(questionSubmit, loginUser))
+                .collect(Collectors.toList());
+
+// 设置去重后的结果到 page 对象
+        questionSubmitVOPage.setRecords(questionSubmitVOList);
+        questionSubmitVOPage.setTotal(questionSubmitVOList.size());
+        return questionSubmitVOPage;
+
     }
 
 

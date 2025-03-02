@@ -4,11 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.yupi.yuoj.model.entity.DailyCheck;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 /**
  * 帖子视图
@@ -20,6 +23,7 @@ import java.util.List;
 public class DailyCheckVO implements Serializable {
 
     private final static Gson GSON = new Gson();
+    private static final Logger log = LoggerFactory.getLogger(DailyCheckVO.class);
 
     /**
      * id
@@ -33,7 +37,7 @@ public class DailyCheckVO implements Serializable {
     /**
      * 日期
      */
-    private Date date;
+    private String stringDate;
     /**
      * 题目 id
      */
@@ -63,6 +67,21 @@ public class DailyCheckVO implements Serializable {
         }
         DailyCheck dailyCheck = new DailyCheck();
         BeanUtils.copyProperties(dailyCheckVO, dailyCheck);
+
+        // 日期字符串
+        String dateString = "2025-02-18";
+
+        // 创建 SimpleDateFormat 对象并指定格式
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = null;
+        try {
+            // 将字符串转换为 Date
+            date = dateFormat.parse(dateString);
+        } catch (ParseException e) {
+            log.error("e: ", e);
+        }
+        dailyCheck.setDate(date);
+
         return dailyCheck;
     }
 
@@ -78,6 +97,11 @@ public class DailyCheckVO implements Serializable {
         }
         DailyCheckVO dailyCheckVO = new DailyCheckVO();
         BeanUtils.copyProperties(dailyCheck, dailyCheckVO);
+
+        // 转换日期格式为 yyyy-MM-dd
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String formattedDate = dateFormat.format(dailyCheck.getDate());
+        dailyCheckVO.setStringDate(formattedDate);
         return dailyCheckVO;
     }
 }

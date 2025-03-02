@@ -12,8 +12,12 @@ export type User = {
     updateTime?: string;
     userAccount?: string;
     userAvatar?: string;
+    userCollege?: string;
     userName?: string;
     userPassword?: string;
     userProfile?: string;
+    userQQ?: string;
     userRole?: string;
+    userSentence?: string;
+    userTags?: string;
 };

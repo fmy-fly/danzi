@@ -3,6 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { BaseResponse_boolean_ } from '../models/BaseResponse_boolean_';
+import type { BaseResponse_List_Map_string_object_ } from '../models/BaseResponse_List_Map_string_object_';
+import type { BaseResponse_List_Question_ } from '../models/BaseResponse_List_Question_';
+import type { BaseResponse_List_QuestionSubmit_ } from '../models/BaseResponse_List_QuestionSubmit_';
 import type { BaseResponse_long_ } from '../models/BaseResponse_long_';
 import type { BaseResponse_Page_Question_ } from '../models/BaseResponse_Page_Question_';
 import type { BaseResponse_Page_QuestionSubmitVO_ } from '../models/BaseResponse_Page_QuestionSubmitVO_';
@@ -202,6 +205,28 @@ questionQueryRequest: QuestionQueryRequest,
     }
 
     /**
+     * listQuestionByTotal
+     * @param questionQueryRequest questionQueryRequest
+     * @returns BaseResponse_List_Question_ OK
+     * @returns any Created
+     * @throws ApiError
+     */
+    public static listQuestionByTotalUsingPost(
+questionQueryRequest: QuestionQueryRequest,
+): CancelablePromise<BaseResponse_List_Question_ | any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/question/question/list/total',
+            body: questionQueryRequest,
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
      * doQuestionSubmit
      * @param questionSubmitAddRequest questionSubmitAddRequest
      * @returns BaseResponse_long_ OK
@@ -236,6 +261,72 @@ questionSubmitQueryRequest: QuestionSubmitQueryRequest,
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/question/question_submit/list/page',
+            body: questionSubmitQueryRequest,
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * listQuestionAcceptSubmitByPage
+     * @param questionSubmitQueryRequest questionSubmitQueryRequest
+     * @returns BaseResponse_Page_QuestionSubmitVO_ OK
+     * @returns any Created
+     * @throws ApiError
+     */
+    public static listQuestionAcceptSubmitByPageUsingPost(
+questionSubmitQueryRequest: QuestionSubmitQueryRequest,
+): CancelablePromise<BaseResponse_Page_QuestionSubmitVO_ | any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/question/question_submit/list/page/accept',
+            body: questionSubmitQueryRequest,
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * listQuestionSubmitByTotal
+     * @param questionSubmitQueryRequest questionSubmitQueryRequest
+     * @returns BaseResponse_List_Map_string_object_ OK
+     * @returns any Created
+     * @throws ApiError
+     */
+    public static listQuestionSubmitByTotalUsingPost(
+questionSubmitQueryRequest: QuestionSubmitQueryRequest,
+): CancelablePromise<BaseResponse_List_Map_string_object_ | any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/question/question_submit/list/total',
+            body: questionSubmitQueryRequest,
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * listQuestionSubmitByTotalRecord
+     * @param questionSubmitQueryRequest questionSubmitQueryRequest
+     * @returns BaseResponse_List_QuestionSubmit_ OK
+     * @returns any Created
+     * @throws ApiError
+     */
+    public static listQuestionSubmitByTotalRecordUsingPost(
+questionSubmitQueryRequest: QuestionSubmitQueryRequest,
+): CancelablePromise<BaseResponse_List_QuestionSubmit_ | any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/question/question_submit/list/total/record',
             body: questionSubmitQueryRequest,
             errors: {
                 401: `Unauthorized`,

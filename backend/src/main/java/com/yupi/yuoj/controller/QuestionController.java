@@ -1,5 +1,7 @@
 package com.yupi.yuoj.controller;
 
+import cn.hutool.core.text.replacer.StrReplacer;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.gson.Gson;
 import com.yupi.yuoj.annotation.AuthCheck;
@@ -27,7 +29,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 题目接口
@@ -334,6 +339,102 @@ public class QuestionController {
         // 返回脱敏信息
         return ResultUtils.success(questionSubmitService.getQuestionSubmitVOPage(questionSubmitPage, loginUser));
     }
+    @PostMapping("/question_submit/list/total")
+    public BaseResponse<List<Map<String, Object>>> listQuestionSubmitByTotal(@RequestBody QuestionSubmitQueryRequest questionSubmitQueryRequest,
+                                                                         HttpServletRequest request) {
+
+
+        // 获取 queryWrapper
+        QueryWrapper<QuestionSubmit> queryWrapper = questionSubmitService.getQueryWrapper(questionSubmitQueryRequest);
+
+        // 执行查询，获取所有的 QuestionSubmit 记录
+        List<QuestionSubmit> results = questionSubmitService.list(queryWrapper);
+
+        // 存储统计结果（日期 -> 次数）
+        Map<String, Integer> submitCountByDate = new HashMap<>();
+
+        // 定义日期格式
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        // 遍历结果，统计每一天的提交次数
+        for (QuestionSubmit questionSubmit : results) {
+            String date = dateFormat.format(questionSubmit.getUpdateTime());
+            submitCountByDate.put(date, submitCountByDate.getOrDefault(date, 0) + 1);
+        }
+
+        // 将结果转换为前端所需格式（List of Map）
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : submitCountByDate.entrySet()) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("date", entry.getKey());
+            result.put("count", entry.getValue());
+            resultList.add(result);
+        }
+        // 返回脱敏信息
+        return ResultUtils.success(resultList);
+    }
+
+
+    @PostMapping("/question_submit/list/page/accept")
+    public BaseResponse<Page<QuestionSubmitVO>> listQuestionAcceptSubmitByPage(@RequestBody QuestionSubmitQueryRequest questionSubmitQueryRequest,
+                                                                         HttpServletRequest request) {
+        long current = questionSubmitQueryRequest.getCurrent();
+        long size = questionSubmitQueryRequest.getPageSize();
+        // 从数据库中查询原始的题目提交分页信息
+
+        Page<QuestionSubmit> questionSubmitPage = questionSubmitService.page(new Page<>(current, size),
+                questionSubmitService.getQueryAcceptWrapper(questionSubmitQueryRequest,userService.getLoginUser(request)));
+        final User loginUser = userService.getLoginUser(request);
+        // 返回脱敏信息
+        return ResultUtils.success(questionSubmitService.getQuestionAcceptSubmitVOPage(questionSubmitPage, loginUser));
+    }
+    @PostMapping("/question/list/total")
+    public BaseResponse<List<Question>> listQuestionByTotal(@RequestBody QuestionQueryRequest questionQueryRequest,
+                                                                             HttpServletRequest request) {
+
+
+        // 获取 queryWrapper
+        QueryWrapper<Question> queryWrapper = questionService.getQueryWrapper(questionQueryRequest);
+
+        // 执行查询，获取所有的 QuestionSubmit 记录
+        List<Question> results = questionService.list(queryWrapper);
+
+
+
+        // 返回脱敏信息
+        return ResultUtils.success(results);
+    }
+    @PostMapping("/question_submit/list/total/record")
+    public BaseResponse<List<QuestionSubmit>> listQuestionSubmitByTotalRecord(@RequestBody QuestionSubmitQueryRequest questionSubmitQueryRequest,
+                                                                             HttpServletRequest request) {
+
+
+        // 获取 queryWrapper
+        QueryWrapper<QuestionSubmit> queryWrapper = questionSubmitService.getQueryWrapper(questionSubmitQueryRequest);
+
+        // 执行查询，获取所有的 QuestionSubmit 记录
+        List<QuestionSubmit> results = questionSubmitService.list(queryWrapper);
+        // 筛选出通过的题目（假设 judgeInfo 中包含判题结果）
+        List<QuestionSubmit> passedResults = results.stream()
+                .filter(submit -> {
+                    // 假设 judgeInfo 有一个 "result" 字段标识是否通过，"AC" 表示通过
+                    return submit.getStatus().equals(2);
+                })
+                .collect(Collectors.toList());
+        // 根据题目 ID 去重，假设 QuestionSubmit 中有一个 getQuestionId() 方法来获取题目 ID
+        Map<Long, QuestionSubmit> distinctByQuestionId = passedResults.stream()
+                .collect(Collectors.toMap(
+                        QuestionSubmit::getQuestionId,    // 使用题目 ID 作为键
+                        submit -> submit,                  // 题目提交记录本身作为值
+                        (existing, replacement) -> existing // 如果有重复的题目 ID，保留第一个出现的记录
+                ));
+
+        // 返回去重后的结果，转换为列表
+        return ResultUtils.success(new ArrayList<>(distinctByQuestionId.values()));
+
+
+    }
+
 
 
 

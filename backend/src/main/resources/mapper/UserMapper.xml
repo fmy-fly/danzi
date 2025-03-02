@@ -13,6 +13,11 @@
         <result property="userAvatar" column="userAvatar" jdbcType="VARCHAR"/>
         <result property="userProfile" column="userProfile" jdbcType="VARCHAR"/>
         <result property="userRole" column="userRole" jdbcType="VARCHAR"/>
+        <result property="userSentence" column="userSentence" jdbcType="VARCHAR"/>
+        <result property="userCollege" column="userCollege" jdbcType="VARCHAR"/>
+        <result property="userQQ" column="userQQ" jdbcType="VARCHAR"/>
+        <result property="userTags" column="userTags" jdbcType="VARCHAR"/>
+
         <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
         <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>

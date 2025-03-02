@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 * @createDate 2023-08-07 20:58:53
 */
 public interface QuestionSubmitService extends IService<QuestionSubmit> {
-    
+    QueryWrapper<QuestionSubmit> getQueryAcceptWrapper(QuestionSubmitQueryRequest questionSubmitQueryRequest, User loginUser);
     /**
      * 题目提交
      *
@@ -55,4 +55,5 @@ public interface QuestionSubmitService extends IService<QuestionSubmit> {
      * @return
      */
     Page<QuestionSubmitVO> getQuestionSubmitVOPage(Page<QuestionSubmit> questionSubmitPage, User loginUser);
+    Page<QuestionSubmitVO> getQuestionAcceptSubmitVOPage(Page<QuestionSubmit> questionSubmitPage, User loginUser) ;
 }

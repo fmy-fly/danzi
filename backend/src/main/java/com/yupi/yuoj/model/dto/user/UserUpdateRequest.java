@@ -1,6 +1,8 @@
 package com.yupi.yuoj.model.dto.user;
 
 import java.io.Serializable;
+import java.util.List;
+
 import lombok.Data;
 
 /**
@@ -35,6 +37,24 @@ public class UserUpdateRequest implements Serializable {
      * 用户角色：user/admin/ban
      */
     private String userRole;
+
+    /**
+     * 用户座右铭
+     */
+    private String userSentence;
+    /**
+     * 用户QQ
+     */
+    private String userQQ;
+    /**
+     * 用户学校
+     */
+    private String userCollege;
+
+    /**
+     * 用户爱好
+     */
+    private List<String> userTags;
 
     private static final long serialVersionUID = 1L;
 }

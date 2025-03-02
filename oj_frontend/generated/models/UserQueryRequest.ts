@@ -11,7 +11,11 @@ export type UserQueryRequest = {
     sortField?: string;
     sortOrder?: string;
     unionId?: string;
+    userCollege?: string;
     userName?: string;
     userProfile?: string;
+    userQQ?: string;
     userRole?: string;
+    userSentence?: string;
+    userTags?: Array<string>;
 };

@@ -5,6 +5,10 @@
 
 export type UserUpdateMyRequest = {
     userAvatar?: string;
+    userCollege?: string;
     userName?: string;
     userProfile?: string;
+    userQQ?: string;
+    userSentence?: string;
+    userTags?: Array<string>;
 };

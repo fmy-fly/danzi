@@ -48,7 +48,7 @@
                 {{
                   `${
                     record.submitNum
-                      ? (record.acceptedNum / record.submitNum) * 100
+                      ? (record.acceptedNum / record.submitNum).toFixed(2) * 100
                       : "0"
                   }% (${record.acceptedNum}/${record.submitNum})`
                 }}
@@ -140,7 +140,7 @@ const total = ref(0);
 const searchParams = ref<QuestionQueryRequest>({
   title: "",
   tags: [],
-  pageSize: 2,
+  pageSize: 10,
   current: 1,
 });
 

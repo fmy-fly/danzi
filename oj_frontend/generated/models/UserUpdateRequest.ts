@@ -6,7 +6,11 @@
 export type UserUpdateRequest = {
     id?: number;
     userAvatar?: string;
+    userCollege?: string;
     userName?: string;
     userProfile?: string;
+    userQQ?: string;
     userRole?: string;
+    userSentence?: string;
+    userTags?: Array<string>;
 };
