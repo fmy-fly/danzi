@@ -104,7 +104,8 @@ const searchParams = ref<QuestionQueryRequest>({
 // 定义数据列表和总记录数
 const dataList = ref([]);
 const total = ref(0);
-
+import { useStore } from "vuex";
+const store = useStore();
 // 加载数据
 const loadData = async () => {
   const res =
@@ -118,17 +119,40 @@ const loadData = async () => {
   } else {
     message.error("加载失败，" + res.message);
   }
-};
 
-// 监控分页参数变化
+  saveAllQuestions();
+  replaceIdsWithMap();
+};
+const saveAllQuestions = () => {
+  store.dispatch("user/updateAllQuestions", dataList.value);
+};
+/**
+ * 监听 searchParams 变量，改变时触发页面的重新加载
+ */
 watchEffect(() => {
   loadData();
 });
 
-// 页面加载时请求数据
+/**
+ * 页面加载时，请求数据
+ */
 onMounted(() => {
   loadData();
+  replaceIdsWithMap();
 });
+// setTimeout(() => {
+//   replaceIdsWithMap();
+// }, 500); // 2000 毫秒，即 2 秒
+// {id: "1", title: "A+ D", content: "新的题目内容", tags: "["二叉树"]", answer: "新的答案", submitNum: 0,…}
+function replaceIdsWithMap() {
+  dataList.value.forEach((item) => {
+    const newId = store.state.user.questions.questionMap.get(item.id); // 从 store 中的 Map 获取新 id
+    if (newId !== undefined) {
+      // 如果存在新 id，则替换
+      item.id = newId;
+    }
+  });
+}
 
 // 更新分页信息
 const updatePage = (newPage: number) => {

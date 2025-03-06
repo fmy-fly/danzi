@@ -105,7 +105,7 @@ const acceptCount = ref({
   hard: 0,
 });
 const acceptRatio = ref({
-  easy: 0.2,
+  easy: 0,
   medium: 0,
   hard: 0,
 });

@@ -12,8 +12,8 @@
           disabled
         >
           <div class="title-bar">
-            <img class="logo" src="../assets/oj-logo.svg" />
-            <div class="title">鱼 OJ</div>
+            <img class="logo" src="../assets//git.png" />
+            <div class="title">贵州理工大学 OJ</div>
           </div>
         </a-menu-item>
         <a-menu-item v-for="item in visibleRoutes" :key="item.path">

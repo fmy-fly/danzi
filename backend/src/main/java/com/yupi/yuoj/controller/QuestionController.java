@@ -404,6 +404,20 @@ public class QuestionController {
         // 返回脱敏信息
         return ResultUtils.success(results);
     }
+    @PostMapping("/questionSubmit/list/total/all")
+    public BaseResponse<List<QuestionSubmit>> listQuestionSubmitALLByTotal(@RequestBody QuestionSubmitQueryRequest questionSubmitQueryRequest,
+                                                            HttpServletRequest request) {
+
+
+        // 获取 queryWrapper
+        QueryWrapper<QuestionSubmit> queryWrapper = questionSubmitService.getQueryWrapper(questionSubmitQueryRequest);
+
+        // 执行查询，获取所有的 QuestionSubmit 记录
+        List<QuestionSubmit> results = questionSubmitService.list(queryWrapper);
+
+        // 返回脱敏信息
+        return ResultUtils.success(results);
+    }
     @PostMapping("/question_submit/list/total/record")
     public BaseResponse<List<QuestionSubmit>> listQuestionSubmitByTotalRecord(@RequestBody QuestionSubmitQueryRequest questionSubmitQueryRequest,
                                                                              HttpServletRequest request) {

@@ -21,7 +21,6 @@ const fetchAttendanceData = async () => {
   const res = await DailyCheckControllerService.getUserRoutineUsingGet();
   if (res.code === 0) {
     attendanceData.value = res.data; // 将打卡数据存储到 state 中
-    console.log("riqi", attendanceData.value);
   } else {
     console.error("加载打卡数据失败", res.message);
   }

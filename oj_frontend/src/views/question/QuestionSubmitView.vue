@@ -53,6 +53,7 @@ import {
 import message from "@arco-design/web-vue/es/message";
 import { useRouter } from "vue-router";
 import moment from "moment";
+import { useStore } from "vuex";
 
 const tableRef = ref();
 
@@ -64,7 +65,11 @@ const searchParams = ref<QuestionSubmitQueryRequest>({
   pageSize: 10,
   current: 1,
 });
-
+const totalDataList = ref([]);
+const store = useStore();
+const saveAllQuestions = () => {
+  store.dispatch("user/updateAllQuestions", totalDataList.value);
+};
 const loadData = async () => {
   const res = await QuestionControllerService.listQuestionSubmitByPageUsingPost(
     {
@@ -79,6 +84,13 @@ const loadData = async () => {
   } else {
     message.error("加载失败，" + res.message);
   }
+  const res2 =
+    await QuestionControllerService.listQuestionSubmitAllByTotalUsingPost(
+      searchParams.value
+    );
+  totalDataList.value = res2.data;
+  saveAllQuestions();
+  replaceIdsWithMap();
 };
 
 /**
@@ -93,8 +105,21 @@ watchEffect(() => {
  */
 onMounted(() => {
   loadData();
+  replaceIdsWithMap();
 });
-
+// setTimeout(() => {
+//   replaceIdsWithMap();
+// }, 500); // 2000 毫秒，即 2 秒
+// {id: "1", title: "A+ D", content: "新的题目内容", tags: "["二叉树"]", answer: "新的答案", submitNum: 0,…}
+function replaceIdsWithMap() {
+  dataList.value.forEach((item) => {
+    const newId = store.state.user.questions.questionMap.get(item.id); // 从 store 中的 Map 获取新 id
+    if (newId !== undefined) {
+      // 如果存在新 id，则替换
+      item.id = newId;
+    }
+  });
+}
 const columns = [
   {
     title: "提交号",

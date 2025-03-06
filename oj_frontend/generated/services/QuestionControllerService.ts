@@ -227,6 +227,28 @@ questionQueryRequest: QuestionQueryRequest,
     }
 
     /**
+     * listQuestionSubmitALLByTotal
+     * @param questionSubmitQueryRequest questionSubmitQueryRequest
+     * @returns BaseResponse_List_QuestionSubmit_ OK
+     * @returns any Created
+     * @throws ApiError
+     */
+    public static listQuestionSubmitAllByTotalUsingPost(
+questionSubmitQueryRequest: QuestionSubmitQueryRequest,
+): CancelablePromise<BaseResponse_List_QuestionSubmit_ | any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/question/questionSubmit/list/total/all',
+            body: questionSubmitQueryRequest,
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
      * doQuestionSubmit
      * @param questionSubmitAddRequest questionSubmitAddRequest
      * @returns BaseResponse_long_ OK

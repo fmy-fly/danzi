@@ -32,6 +32,7 @@ import {
 import message from "@arco-design/web-vue/es/message";
 import * as querystring from "querystring";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 
 const tableRef = ref();
 
@@ -42,6 +43,10 @@ const searchParams = ref({
   current: 1,
 });
 
+const store = useStore();
+const saveAllQuestions = () => {
+  store.dispatch("user/updateAllQuestions", dataList.value);
+};
 const loadData = async () => {
   const res = await QuestionControllerService.listQuestionByPageUsingPost(
     searchParams.value
@@ -52,6 +57,8 @@ const loadData = async () => {
   } else {
     message.error("加载失败，" + res.message);
   }
+  saveAllQuestions();
+  replaceIdsWithMap();
 };
 
 /**
@@ -60,13 +67,31 @@ const loadData = async () => {
 watchEffect(() => {
   loadData();
 });
+const reversedMap = {};
 
 /**
  * 页面加载时，请求数据
  */
 onMounted(() => {
   loadData();
+  replaceIdsWithMap();
 });
+// setTimeout(() => {
+//   replaceIdsWithMap();
+// }, 500); // 2000 毫秒，即 2 秒
+// {id: "1", title: "A+ D", content: "新的题目内容", tags: "["二叉树"]", answer: "新的答案", submitNum: 0,…}
+function replaceIdsWithMap() {
+  dataList.value.forEach((item) => {
+    const newId = store.state.user.questions.questionMap.get(item.id); // 从 store 中的 Map 获取新 id
+    store.state.user.questions.questionMap.forEach((value, key) => {
+      reversedMap[key] = value;
+    });
+    if (newId !== undefined) {
+      // 如果存在新 id，则替换
+      item.id = newId;
+    }
+  });
+}
 
 // {id: "1", title: "A+ D", content: "新的题目内容", tags: "["二叉树"]", answer: "新的答案", submitNum: 0,…}
 
@@ -146,7 +171,7 @@ const doUpdate = (question: Question) => {
   router.push({
     path: "/update/question",
     query: {
-      id: question.id,
+      id: reversedMap[question.id],
     },
   });
 };

@@ -93,7 +93,7 @@ export const routes: Array<RouteRecordRaw> = [
     name: "隐藏页面",
     component: HomeView,
     meta: {
-      // hideInMenu: true,
+      hideInMenu: true,
     },
   },
   {
